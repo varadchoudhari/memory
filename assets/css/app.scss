@@ -15,7 +15,9 @@ h1 { text-align: center; }
   background-color: #026DAE;
 }
 .matchtile {
+  display: inline-block;
   text-align: center;
+  color: white;
   vertical-align: middle;
   width: 150px;
   height: 150px;
