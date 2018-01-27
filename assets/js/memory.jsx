@@ -7,113 +7,172 @@ export default function run_game(root) {
 }
 
 class Square extends React.Component {
-  showValue(id,value,handler, click_count) {
-    let button = document.getElementById(id);
-    button.style.background = "#FFF";
-    button.innerHTML = value;
-    if(click_count == 1) {
-      handler(value, 0, id);
-    }
-    else {
-      let new_count = click_count + 1;
-      handler(value, new_count, id);
-    }
 
-  }
-  hideValue(id,value,handler) {
-    let button = document.getElementById(id);
-    button.style.background = "#026DAE";
-    button.innerHTML = "";
-  }
-  analyse(id, value, reset_previous, handler, previous_click, click_count, previous_id, updatescore, getscore) {
-    let show = this.showValue(id,value,handler, click_count);
-
-    let score = getscore + 1;
-    updatescore(score);
-
-    document.getElementById(id).disabled = true;
-
-    if(previous_click == value) {
-      let first = document.getElementById(id);
-      let second = document.getElementById(previous_id);
-      let newelement1 = document.createElement("div");
-      let newelement2 = document.createElement("div");
-      newelement1.innerHTML = "✓";
-      newelement2.innerHTML = "✓";
-      newelement1.setAttribute("id",id);
-      newelement1.setAttribute("class","matchtile");
-      newelement2.setAttribute("id",previous_id);
-      newelement2.setAttribute("class","matchtile");
-      setTimeout(() => {
-        first.replaceWith(newelement1);
-        second.replaceWith(newelement2);
-      },500);
-    }
-    else if(click_count == 1) {
-      let buttons = Array.from(document.getElementsByTagName("button"));
-      for(let i = 0; i < buttons.length; i++) {
-          buttons[i].disabled = true;
-      }
-      setTimeout(() => {this.hideValue(id,value,handler);},1000);
-      setTimeout(() => {this.hideValue(previous_id,value,handler);},1000);
-      setTimeout(() => {
-        for(let i = 0; i < buttons.length; i++) {
-            buttons[i].disabled = false;
-        }
-      },1000);
-      reset_previous(); //function to reset previous entries
-    }
-  }
   render() {
-    let uid = this.props.uid;
+    let id = this.props.id;
     let value = this.props.value;
-    let handler = this.props.handler;
-    let previous_click = this.props.previous;
-    let click_count = this.props.clickcount;
-    let previous_id = this.props.previousId;
-    let reset_previous = this.props.reset_previous;
-    let updatescore = this.props.updatescore;
-    let getscore = this.props.getscore;
-
-    return (<button id={uid} className="tile" onClick={() => this.analyse(uid, value, reset_previous, handler, previous_click, click_count, previous_id, updatescore, getscore)}>
-    </button>);
-  }
+    let disabled_buttons = this.props.disabled_buttons;
+    let bgColor = this.props.bgColor;
+    return (<button className="tile" disabled={disabled_buttons[id]} style={{backgroundColor:bgColor[id]}} onClick={() => {
+      let onClick = this.props.onClick;
+      onClick(id, value);
+    }}>
+    {this.props.current_value}
+  </button>);
+}
 }
 
 class Board extends React.Component {
   constructor(props) {
     super(props);
-    this.handler = this.handler.bind(this);
-    this.updatescore = this.updatescore.bind(this);
-    this.reset_previous = this.reset_previous.bind(this);
+    this.reset = this.reset.bind(this);
+    this.onClick = this.onClick.bind(this);
     this.state = {
       tile_values: [],
-      previously_clicked: "",
-      previously_clicked_id: "",
+      clicks: new Array(16).fill(null),
+      matched: [],
+      disabled_buttons: new Array(16).fill(false),
+      bgColor: ["#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE"],
       click_count: 0,
       score: 0,
+      previous_click: [],
+      previous_id: [],
     };
   }
 
-  handler(button_value, click_count, id) {
-    this.setState({previously_clicked: button_value, click_count: click_count, previously_clicked_id:id});
+  onClick(id, value) {
+    this.setTileValue(id);
+    this.setCount(id, value);
+    this.setPreviousClick(id, value);
+
   }
 
-  reset_previous() {
-    this.setState({previously_clicked: "", previously_clicked_id: ""});
+  setTileValue(id) {
+    let local_clicks = this.state.clicks.slice();
+    local_clicks[id] = this.state.tile_values[id];
+    this.setState({clicks: local_clicks});
+
+    let local_bgColor = this.state.bgColor.slice();
+    local_bgColor[id] = "#DCDCDC";
+    this.setState({bgColor: local_bgColor});
   }
 
-  updatescore(score) {
-    this.setState({score: score});
+  setCount(id, value) {
+    let local_click_count = this.state.click_count;
+    local_click_count = local_click_count + 1;
+    this.setState({click_count: local_click_count},() => {
+      this.getCount(id, value);
+    });
+    let local_score = this.state.score;
+    local_score = local_score + 1;
+    this.setState({score: local_score})
+  }
+
+  getCount(id, value) {
+    let local_click_count = this.state.click_count;
+    if(local_click_count == 2) {
+      if(this.state.previous_click[0] == this.state.previous_click[1]) {
+
+        let local_bgColor = this.state.bgColor.slice();
+        local_bgColor[this.state.previous_id[0]] = "#2b921b";
+        local_bgColor[this.state.previous_id[1]] = "#2b921b";
+
+        let local_clicks = this.state.clicks.slice();
+        local_clicks[this.state.previous_id[0]] = "";
+        local_clicks[this.state.previous_id[1]] = "";
+
+        let local_matched = this.state.matched.slice();
+        local_matched.push(this.state.previous_id[0]);
+        local_matched.push(this.state.previous_id[1]);
+
+        let disable_everything = new Array(16).fill(true);
+        this.setState({disabled_buttons: disable_everything});
+        let enable_everything = new Array(16).fill(false);
+        for(let i = 0; i < local_matched.length; i++) {
+          enable_everything[local_matched[i]] = true;
+        }
+
+        setTimeout(() => {
+          this.setState({disabled_buttons: enable_everything});
+          this.setState({clicks: local_clicks});
+          this.setState({bgColor: local_bgColor});
+          this.setState({matched: local_matched});
+          this.setState({click_count:0});
+          this.setState({previous_click: []});
+          this.setState({previous_id: []});
+        },1000);
+
+      }
+      else {
+      this.setState({click_count:0});
+      let disable_everything = new Array(16).fill(true);
+
+      this.setState({disabled_buttons: disable_everything});
+
+      let enable_everything = new Array(16).fill(false);
+      let local_matched = this.state.matched.slice();
+      let local_bgColor = ["026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE"];
+      for(let i = 0; i < local_matched.length; i++) {
+        enable_everything[local_matched[i]] = true;
+        local_bgColor[local_matched[i]] = "#2b921b";
+      }
+
+      setTimeout(() => {
+        this.setState({disabled_buttons: enable_everything});
+        this.setState({bgColor: local_bgColor});
+        let local_clicks = this.state.clicks.slice();
+        let previous_value_one = this.state.previous_click[0];
+        let previous_value_two = this.state.previous_click[1];
+        local_clicks[local_clicks.indexOf(previous_value_one)] = "";
+        local_clicks[local_clicks.indexOf(previous_value_two)] = "";
+
+        local_bgColor[this.state.previous_id[0]] = "#026DAE";
+        local_bgColor[this.state.previous_id[1]] = "#026DAE";
+
+
+        this.setState({bgColor: local_bgColor});
+        this.setState({clicks: local_clicks});
+        this.setState({previous_click: []});
+        this.setState({previous_id: []});
+
+      },1000);
+    }
+    }
+    else {
+      let local_previous_id = this.state.previous_id[0];
+      let local_disabled_buttons = this.state.disabled_buttons.slice();
+      local_disabled_buttons[local_previous_id] = true;
+      this.setState({disabled_buttons: local_disabled_buttons});
+    }
+  }
+
+  reset() {
+    this.shuffleAndSet();
+    let local_clicks = new Array(16).fill(null);
+    this.setState({clicks: local_clicks});
+    this.setState({matched: []});
+    this.setState({disabled_buttons: new Array(16).fill(false)});
+    this.setState({bgColor: ["#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE"]});
+    this.setState({click_count: 0});
+    this.setState({score: 0});
+    this.setState({previous_click: []});
+    this.setState({previous_id: []});
+
+  }
+
+
+  setPreviousClick(id, value) {
+    let local_previous_click = this.state.previous_click.slice();
+    local_previous_click.push(value);
+    this.setState({previous_click: local_previous_click});
+
+    let local_previous_id = this.state.previous_id.slice();
+    local_previous_id.push(id);
+    this.setState({previous_id: local_previous_id});
   }
 
   renderTile(id) {
-    let tile_value = this.state.tile_values[id];
-    let previous_value = this.state.previously_clicked;
-    let click_count = this.state.click_count;
-    let previous_id = this.state.previously_clicked_id;
-    let getscore = this.state.score;
-    return <Square uid={id} value={tile_value} reset_previous={this.reset_previous} handler = {this.handler} previous={previous_value} clickcount={click_count} previousId={previous_id} updatescore={this.updatescore} getscore={getscore}/>;
+    return <Square id={id} value={this.state.tile_values[id]} current_value={this.state.clicks[id]} disabled_buttons={this.state.disabled_buttons} bgColor={this.state.bgColor} onClick={this.onClick}/>
   }
 
   shuffleAndSet() {
@@ -128,10 +187,10 @@ class Board extends React.Component {
       alphabets[index] = temp;
     }
     this.setState({tile_values: alphabets})
-    }
-    componentWillMount() {
-      this.shuffleAndSet();
-    }
+  }
+  componentWillMount() {
+    this.shuffleAndSet();
+  }
   render() {
     return (
       <div id="board">
@@ -161,6 +220,9 @@ class Board extends React.Component {
         </div>
         <div>
           Score: {this.state.score}
+        </div>
+        <div>
+          <button onClick={this.reset}>Restart</button>
         </div>
       </div>
     );
