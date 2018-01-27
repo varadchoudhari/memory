@@ -32,7 +32,7 @@ class Board extends React.Component {
       clicks: new Array(16).fill(null),
       matched: [],
       disabled_buttons: new Array(16).fill(false),
-      bgColor: ["#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE","#026DAE"],
+      bgColor: new Array(16).fill("#026DAE"),
       click_count: 0,
       score: 0,
       previous_click: [],
@@ -111,7 +111,7 @@ class Board extends React.Component {
 
       let enable_everything = new Array(16).fill(false);
       let local_matched = this.state.matched.slice();
-      let local_bgColor = ["026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE","026DAE"];
+      let local_bgColor = new Array(16).fill("#026DAE");
       for(let i = 0; i < local_matched.length; i++) {
         enable_everything[local_matched[i]] = true;
         local_bgColor[local_matched[i]] = "#2b921b";
