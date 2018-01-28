@@ -104,39 +104,39 @@ class Board extends React.Component {
 
       }
       else {
-      this.setState({click_count:0});
-      let disable_everything = new Array(16).fill(true);
+        this.setState({click_count:0});
+        let disable_everything = new Array(16).fill(true);
 
-      this.setState({disabled_buttons: disable_everything});
+        this.setState({disabled_buttons: disable_everything});
 
-      let enable_everything = new Array(16).fill(false);
-      let local_matched = this.state.matched.slice();
-      let local_bgColor = new Array(16).fill("#026DAE");
-      for(let i = 0; i < local_matched.length; i++) {
-        enable_everything[local_matched[i]] = true;
-        local_bgColor[local_matched[i]] = "#2b921b";
+        let enable_everything = new Array(16).fill(false);
+        let local_matched = this.state.matched.slice();
+        let local_bgColor = new Array(16).fill("#026DAE");
+        for(let i = 0; i < local_matched.length; i++) {
+          enable_everything[local_matched[i]] = true;
+          local_bgColor[local_matched[i]] = "#2b921b";
+        }
+
+        setTimeout(() => {
+          this.setState({disabled_buttons: enable_everything});
+          this.setState({bgColor: local_bgColor});
+          let local_clicks = this.state.clicks.slice();
+          let previous_value_one = this.state.previous_click[0];
+          let previous_value_two = this.state.previous_click[1];
+          local_clicks[local_clicks.indexOf(previous_value_one)] = "";
+          local_clicks[local_clicks.indexOf(previous_value_two)] = "";
+
+          local_bgColor[this.state.previous_id[0]] = "#026DAE";
+          local_bgColor[this.state.previous_id[1]] = "#026DAE";
+
+
+          this.setState({bgColor: local_bgColor});
+          this.setState({clicks: local_clicks});
+          this.setState({previous_click: []});
+          this.setState({previous_id: []});
+
+        },1000);
       }
-
-      setTimeout(() => {
-        this.setState({disabled_buttons: enable_everything});
-        this.setState({bgColor: local_bgColor});
-        let local_clicks = this.state.clicks.slice();
-        let previous_value_one = this.state.previous_click[0];
-        let previous_value_two = this.state.previous_click[1];
-        local_clicks[local_clicks.indexOf(previous_value_one)] = "";
-        local_clicks[local_clicks.indexOf(previous_value_two)] = "";
-
-        local_bgColor[this.state.previous_id[0]] = "#026DAE";
-        local_bgColor[this.state.previous_id[1]] = "#026DAE";
-
-
-        this.setState({bgColor: local_bgColor});
-        this.setState({clicks: local_clicks});
-        this.setState({previous_click: []});
-        this.setState({previous_id: []});
-
-      },1000);
-    }
     }
     else {
       let local_previous_id = this.state.previous_id[0];
