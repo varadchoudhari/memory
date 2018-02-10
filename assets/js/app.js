@@ -18,13 +18,14 @@ import "phoenix_html";
 // Local files can be imported directly using relative
 // paths "./socket" or full ones "web/static/js/socket".
 
-// import socket from "./socket"
+import socket from "./socket";
 
-import run_game from "./memory";
+import run_game from "./memory2";
 
 function init() {
   let root = document.getElementById('game');
-  run_game(root);
+  let channel = socket.channel("games:varad", {});
+  run_game(root, channel);
 }
 
 // Use jQuery to delay until page loaded.
