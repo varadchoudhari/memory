@@ -13,8 +13,8 @@ class Board extends React.Component {
     //Initializing channel
     this.channel = props.channel;
     this.channel.join()
-      .receive("ok", this.gotView.bind(this))
-      .receive("error", resp => { console.log("Unable to join", resp); });
+    .receive("ok", this.gotView.bind(this))
+    .receive("error", resp => { console.log("Unable to join", resp); });
 
     //Bind the helper functions that I am using cross components
     this.reset = this.reset.bind(this);
@@ -62,9 +62,14 @@ class Board extends React.Component {
 
   applyLogic(id) {
     this.channel.push("applyLogic", {tileClicked: id}).receive("applyLogicDone", msg => {
-      setTimeout(() => {
+      if (msg.count == 1) {
+        this.setState(msg.game)
+      }
+      else {
+        setTimeout(() => {
           this.setState(msg.game)
-      }, 1000);
+        }, 1000);
+      }
     });
   }
 
@@ -122,9 +127,9 @@ function Square(params) {
   let bgColor = params.bgColor
 
   return (<button className="tile" disabled={disabled_buttons[id]} style={{backgroundColor:bgColor[id]}} onClick={() => {
-         let onClick = params.onClick;
-         onClick(id);
-       }}>
-       {params.current_value}
-     </button>);
+    let onClick = params.onClick;
+    onClick(id);
+  }}>
+  {params.current_value}
+</button>);
 }

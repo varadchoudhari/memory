@@ -6,7 +6,6 @@ defmodule MemoryWeb.GamesChannel do
   def join("games:" <> name, payload, socket) do
     if authorized?(payload) do
       game = Game.new()
-      IO.inspect game, label: "the game"
       socket = socket
       |> assign(:game, game)
       |> assign(:name, name)
@@ -47,7 +46,11 @@ defmodule MemoryWeb.GamesChannel do
     socket = assign(socket, :game, game1)
 
     #reply back to the client
-    {:reply, {:applyLogicDone, %{"game" => Game.client_view(socket.assigns[:game])}}, socket}
+    if game1.click_count == 1 do
+    {:reply, {:applyLogicDone, %{"game" => Game.client_view(socket.assigns[:game]), "count" => 1}}, socket}
+    else
+    {:reply, {:applyLogicDone, %{"game" => Game.client_view(socket.assigns[:game]), "count" => 2}}, socket}
+    end
   end
 
   def handle_in("ping", payload, socket) do
