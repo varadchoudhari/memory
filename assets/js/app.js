@@ -24,8 +24,14 @@ import run_game from "./memory2";
 
 function init() {
   let root = document.getElementById('game');
-  let channel = socket.channel("games:varad", {});
-  run_game(root, channel);
+  if (root) {
+    let channel = socket.channel("games:"+window.gameName, {});
+    run_game(root, channel);
+  }
+  if (document.getElementById('index-page')) {
+    form_init();
+  }
+
 }
 
 // Use jQuery to delay until page loaded.

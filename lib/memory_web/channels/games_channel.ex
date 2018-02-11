@@ -5,7 +5,7 @@ defmodule MemoryWeb.GamesChannel do
 
   def join("games:" <> name, payload, socket) do
     if authorized?(payload) do
-      game = Game.new()
+      game = Memory.GameBackup.load(name) || Game.new()
       socket = socket
       |> assign(:game, game)
       |> assign(:name, name)
@@ -28,6 +28,8 @@ defmodule MemoryWeb.GamesChannel do
     withPreviousClick = Game.setPreviousClick(payload["tileClicked"], withNewClickCount)
     withPreviousId = Game.setPreviousId(payload["tileClicked"], withPreviousClick)
 
+    #take backup
+    Memory.GameBackup.save(socket.assigns[:name], withPreviousId)
     #assign global game state with local modified state
     socket = assign(socket, :game, withPreviousId)
 
@@ -41,6 +43,9 @@ defmodule MemoryWeb.GamesChannel do
 
     #perform operations
     game1 = Game.applyLogic(game0, socket)
+
+    #take backup
+    Memory.GameBackup.save(socket.assigns[:name], game1)
 
     #assign global game state with local modfified state
     socket = assign(socket, :game, game1)
@@ -63,6 +68,9 @@ defmodule MemoryWeb.GamesChannel do
 
     #perform operations
     game1 = Game.reset()
+
+    #take backup
+    Memory.GameBackup.save(socket.assigns[:name], game1)
 
     #assign global game state with local modfified state
     socket = assign(socket, :game, game1)

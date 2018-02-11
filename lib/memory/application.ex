@@ -12,6 +12,7 @@ defmodule Memory.Application do
       supervisor(MemoryWeb.Endpoint, []),
       # Start your own worker by calling: Memory.Worker.start_link(arg1, arg2, arg3)
       # worker(Memory.Worker, [arg1, arg2, arg3]),
+      worker(Memory.GameBackup, []),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
