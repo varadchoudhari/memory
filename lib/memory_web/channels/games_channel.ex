@@ -52,9 +52,9 @@ defmodule MemoryWeb.GamesChannel do
 
     #reply back to the client
     if game1.click_count == 1 do
-    {:reply, {:applyLogicDone, %{"game" => Game.client_view(socket.assigns[:game]), "count" => 1}}, socket}
+      {:reply, {:applyLogicDone, %{"game" => Game.client_view(socket.assigns[:game]), "count" => 1}}, socket}
     else
-    {:reply, {:applyLogicDone, %{"game" => Game.client_view(socket.assigns[:game]), "count" => 2}}, socket}
+      {:reply, {:applyLogicDone, %{"game" => Game.client_view(socket.assigns[:game]), "count" => 2}}, socket}
     end
   end
 
