@@ -131,12 +131,12 @@ defmodule Memory.Game do
         accu = iterateListAndEnable(matched2, length(matched2), enable_everything)
 
         state1 = Map.put(game, :bgColor, bgColor2)
-        state2 = Map.put(state1, :clicks, clicks)
-        state3 = Map.put(state2, :click_count, 0)
-        state4 = Map.put(state3, :disabled_buttons, accu)
-        state5 = Map.put(state4, :previous_click, [])
-        state6 = Map.put(state5, :previous_id, [])
-        Map.put(state6, :matched, matched2)
+        |> Map.put(:clicks, clicks)
+        |> Map.put(:click_count, 0)
+        |> Map.put(:disabled_buttons, accu)
+        |> Map.put(:previous_click, [])
+        |> Map.put(:previous_id, [])
+        |> Map.put(:matched, matched2)
       else
         click_count = 0
         local_disabled_buttons = List.duplicate true, 16
@@ -151,11 +151,11 @@ defmodule Memory.Game do
         clicks2 = List.replace_at(clicks1, Enum.at(game.previous_id,1),nil)
 
         state1 = Map.put(game, :disabled_buttons, btn)
-        state2 = Map.put(state1, :bgColor, col)
-        state3 = Map.put(state2, :previous_click, [])
-        state4 = Map.put(state3, :previous_id, [])
-        state5 = Map.put(state4, :clicks, clicks2)
-        Map.put(state5, :click_count, click_count)
+        |> Map.put(:bgColor, col)
+        |> Map.put(:previous_click, [])
+        |> Map.put(:previous_id, [])
+        |> Map.put(:clicks, clicks2)
+        |> Map.put(:click_count, click_count)
       end
     else
       game
@@ -199,7 +199,4 @@ defmodule Memory.Game do
       previous_id: [],
     }
   end
-
-
-
 end

@@ -18,15 +18,15 @@ defmodule MemoryWeb.GamesChannel do
   def handle_in("logTileData", payload, socket) do
     #assign global game state to game
     game = socket.assigns[:game]
-
+    tileClicked = payload["tileClicked"]
     #perform operations
-    withNewValue = Game.setTileValue(payload["tileClicked"], game)
-    withNewColor = Game.setTileColor(payload["tileClicked"], withNewValue)
-    withDisabledButtons = Game.setDisable(payload["tileClicked"], withNewColor)
+    withNewValue = Game.setTileValue(tileClicked, game)
+    withNewColor = Game.setTileColor(tileClicked, withNewValue)
+    withDisabledButtons = Game.setDisable(tileClicked, withNewColor)
     withNewScore = Game.setScore(withDisabledButtons)
     withNewClickCount = Game.setClickCount(withNewScore)
-    withPreviousClick = Game.setPreviousClick(payload["tileClicked"], withNewClickCount)
-    withPreviousId = Game.setPreviousId(payload["tileClicked"], withPreviousClick)
+    withPreviousClick = Game.setPreviousClick(tileClicked, withNewClickCount)
+    withPreviousId = Game.setPreviousId(tileClicked, withPreviousClick)
 
     #take backup
     Memory.GameBackup.save(socket.assigns[:name], withPreviousId)

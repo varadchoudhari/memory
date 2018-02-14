@@ -56,7 +56,6 @@ class Board extends React.Component {
     this.channel.push("logTileData", {tileClicked: id}).receive("logTileDataDone", msg => {
       this.setState(msg.game)
       this.applyLogic(id)
-
     });
   }
 
